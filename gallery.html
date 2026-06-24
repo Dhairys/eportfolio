@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Gallery</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:15px;
+}
+
+.grid img{
+  width:100%;
+  height:210px;
+  object-fit:cover;
+  border-radius:14px;
+  cursor:pointer;
+  transition:0.35s ease;
+  box-shadow:0 6px 18px rgba(0,0,0,0.08);
+}
+
+.grid img:hover{
+  transform:scale(1.04);
+  filter:brightness(0.95);
+}
+
+/* LIGHTBOX BACKDROP */
+.lightbox{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.35);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  animation: fadeIn 0.25s ease;
+}
+
+/* IMAGE */
+.lightbox img{
+  max-width:88%;
+  max-height:88%;
+  border-radius:16px;
+  box-shadow:0 25px 60px rgba(0,0,0,0.5);
+  animation: pop 0.25s ease;
+}
+
+/* GLASS BUTTONS */
+.btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.2);
+  color:white;
+  font-size:28px;
+  padding:12px 16px;
+  cursor:pointer;
+  border-radius:12px;
+  backdrop-filter: blur(10px);
+  transition:0.2s;
+}
+
+.btn:hover{
+  background:rgba(255,255,255,0.18);
+}
+
+.prev{ left:18px; }
+.next{ right:18px; }
+
+.close{
+  position:absolute;
+  top:18px;
+  right:18px;
+  font-size:22px;
+  color:white;
+  cursor:pointer;
+  padding:8px 12px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+@keyframes pop{
+  from{transform:scale(0.85); opacity:0}
+  to{transform:scale(1); opacity:1}
+}
+
+/* MOBILE */
+@media(max-width:600px){
+  .grid img{ height:180px; }
+  .btn{ font-size:22px; padding:10px 12px; }
+}
+</style>
+
+</head>
+
+<body>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="self.html">Self</a>
+<a href="achievements.html">Achievements</a>
+<a href="gallery.html">Gallery</a>
+<a href="youtube.html">YouTube</a>
+<a href="portfolio-info.html">Portfolio Info</a>
+<a href="conclusion.html">Conclusion</a>
+</nav>
+
+<div class="container">
+
+<h1>My Gallery</h1>
+
+<h2>Certificates</h2>
+<div class="grid">
+<img src="images/1.jpeg" onclick="openImg(0)">
+<img src="images/2.jpeg" onclick="openImg(1)">
+<img src="images/3.jpg" onclick="openImg(2)">
+<img src="images/4.jpeg" onclick="openImg(3)">
+<img src="images/5.jpeg" onclick="openImg(4)">
+<img src="images/6.jpeg" onclick="openImg(5)">
+</div>
+
+<h2>Photography</h2>
+<div class="grid">
+<img src="images/photo1.jpeg" onclick="openImg(6)">
+<img src="images/photo2.jpeg" onclick="openImg(7)">
+<img src="images/photo3.jpeg" onclick="openImg(8)">
+</div>
+
+<h2>Interests</h2>
+<div class="grid">
+<img src="images/guitar.jpg" onclick="openImg(9)">
+<img src="images/rubik.jpg" onclick="openImg(10)">
+</div>
+
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+
+  <span class="close" onclick="closeImg()">✕</span>
+
+  <button class="btn prev" onclick="prevImg()">❮</button>
+
+  <img id="lightbox-img">
+
+  <button class="btn next" onclick="nextImg()">❯</button>
+
+</div>
+
+<script>
+const images = [
+  "images/1.jpeg",
+  "images/2.jpeg",
+  "images/3.jpg",
+  "images/4.jpeg",
+  "images/5.jpeg",
+  "images/6.jpeg",
+  "images/photo1.jpeg",
+  "images/photo2.jpeg",
+  "images/photo3.jpeg",
+  "images/guitar.jpg",
+  "images/rubik.jpg"
+];
+
+let currentIndex = 0;
+
+function openImg(index){
+  currentIndex = index;
+  const lb = document.getElementById("lightbox");
+  lb.style.display = "flex";
+  document.getElementById("lightbox-img").src = images[currentIndex];
+}
+
+function closeImg(){
+  document.getElementById("lightbox").style.display = "none";
+}
+
+/* NAVIGATION */
+function nextImg(){
+  currentIndex = (currentIndex + 1) % images.length;
+  animateChange();
+}
+
+function prevImg(){
+  currentIndex = (currentIndex - 1 + images.length) % images.length;
+  animateChange();
+}
+
+function animateChange(){
+  const img = document.getElementById("lightbox-img");
+  img.style.opacity = 0;
+  img.style.transform = "scale(0.95)";
+
+  setTimeout(() => {
+    img.src = images[currentIndex];
+    img.style.opacity = 1;
+    img.style.transform = "scale(1)";
+  }, 120);
+}
+
+/* KEYBOARD */
+document.addEventListener("keydown", (e)=>{
+  if(document.getElementById("lightbox").style.display === "flex"){
+    if(e.key === "ArrowRight") nextImg();
+    if(e.key === "ArrowLeft") prevImg();
+    if(e.key === "Escape") closeImg();
+  }
+});
+
+/* MOBILE SWIPE (SMOOTH) */
+let startX = 0;
+
+document.getElementById("lightbox").addEventListener("touchstart",(e)=>{
+  startX = e.touches[0].clientX;
+});
+
+document.getElementById("lightbox").addEventListener("touchend",(e)=>{
+  let endX = e.changedTouches[0].clientX;
+
+  if(startX - endX > 60) nextImg();
+  if(endX - startX > 60) prevImg();
+});
+</script>
+
+<footer>© 2026 Dhairya</footer>
+
+</body>
+</html>
